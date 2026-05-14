@@ -1,17 +1,57 @@
-# internship_finder
+# InternMatch - Internship Finder
 
-A new Flutter project.
+A mobile application that connects students with internship opportunities. Built with Flutter and Firebase.
 
-## Getting Started
+## Features
 
-This project is a starting point for a Flutter application.
+- **Multi-Role Authentication**: Student, Company, and Admin dashboards
+- **Job Listings**: Browse and search internship opportunities
+- **Application Management**: Track applications and statuses
+- **Company Profiles**: Companies can post and manage internships
+- **File Upload**: Resume and portfolio uploads via Firebase Storage
+- **Google Sign-In**: Easy authentication with Google accounts
+- **Real-time Data**: Firestore integration for live updates
 
-A few resources to get you started if this is your first Flutter project:
+## Tech Stack
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+- **Frontend**: Flutter 3.0+
+- **Backend**: Firebase (Auth, Firestore, Cloud Storage, Cloud Functions)
+- **Authentication**: Firebase Auth + Google Sign-In
+- **Database**: Cloud Firestore
+- **Additional**: Font Awesome icons, URL launcher, File picker
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Installation
+
+1. **Prerequisites**:
+   - Flutter SDK 3.0 or higher
+   - Android SDK / Xcode (for iOS)
+   - Firebase project with config files
+
+2. **Clone & Setup**:
+   ```bash
+   flutter pub get
+   flutter run
+   ```
+
+3. **Firebase Configuration**:
+   - Ensure `google-services.json` (Android) and `GoogleService-Info.plist` (iOS) are configured
+   - Update Firebase rules in `firestore.rules`
+
+## Project Structure
+
+- `lib/` - Source code
+  - `screens/` - UI screens (admin, company, user)
+  - `services/` - Firebase and business logic
+  - `models/` - Data models
+  - `widgets/` - Reusable UI components
+  - `utils/` - Constants, themes, helpers
+
+## Development
+
+- Run: `flutter run`
+- Build Android: `flutter build apk`
+- Build iOS: `flutter build ios`
+
+## License
+
+This project is private.
