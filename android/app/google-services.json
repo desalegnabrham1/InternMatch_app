@@ -1,0 +1,54 @@
+﻿{
+  "project_info": {
+    "project_number": "175322652316",
+    "project_id": "internshipapp-eaf18",
+    "storage_bucket": "internshipapp-eaf18.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:175322652316:android:208d575b9d6a5e2d9e1759",
+        "android_client_info": {
+          "package_name": "com.example.internship_finder"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "175322652316-iij8hmvbhm9c3q85336de14ge8p3gc3p.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.internship_finder",
+            "certificate_hash": "6bcb160a0a6c3c66e9950e4b121d9327c60f8455"
+          }
+        },
+        {
+          "client_id": "175322652316-1pu310qcno02gpadv4tql21t3olq7c6d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA4T_-zmZ5k7rTrQ_C7MiOES0anSQOIWdI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "175322652316-1pu310qcno02gpadv4tql21t3olq7c6d.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "175322652316-kg2q9d64161mfhdjeduga9ebgmhjn1k9.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.internshipFinder"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

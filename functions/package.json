@@ -1,0 +1,22 @@
+{
+  "name": "internship-finder-functions",
+  "private": true,
+  "engines": {
+    "node": "18"
+  },
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint . --ext .ts",
+    "deploy": "firebase deploy --only functions",
+    "promote-local": "node promote_admin.js"
+  },
+  "dependencies": {
+    "firebase-admin": "^11.10.0",
+    "firebase-functions": "^4.3.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "eslint": "^8.0.0",
+    "eslint-config-google": "^0.14.0"
+  }
+}

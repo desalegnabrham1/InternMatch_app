@@ -1,0 +1,234 @@
+rules_version = '2';
+//
+// InternMatch – Firestore Security Rules
+//
+// Roles stored in /users/{uid}.role:
+//   "user"    – student
+//   "company" – employer
+//   "admin"   – platform administrator
+//
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Helper functions ────────────────────────────────────────────────────
+
+    /// True when the requesting user is authenticated.
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    /// Fetch the caller's stored role from the users collection.
+    function myRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        // Check custom claims first (most efficient)
+        request.auth.token.admin == true
+        // Fallback to role in Firestore
+        || myRole() == 'admin'
+      );
+    }
+
+    function isCompany() {
+      return isSignedIn() && myRole() == 'company';
+    }
+
+    function hasCompanyProfile(uid) {
+      let userData = get(/databases/$(database)/documents/users/$(uid)).data;
+      return userData != null
+        && (
+          userData.role == 'company'
+          || ('companyName' in userData && userData.companyName is string && userData.companyName.size() > 0)
+          || ('website' in userData && userData.website is string && userData.website.size() > 0)
+          || ('description' in userData && userData.description is string && userData.description.size() > 0)
+        );
+    }
+
+    function isCompanyAccount(uid) {
+      return isSignedIn() && request.auth.uid == uid && hasCompanyProfile(uid);
+    }
+
+    function isValidInternshipCreate() {
+      return request.resource.data.keys().hasOnly([
+          'title',
+          'companyName',
+          'location',
+          'description',
+          'requirement',
+          'contactEmail',
+          'contactPhone',
+          'deadline',
+          'createdBy',
+          'createdAt'
+        ])
+        && request.resource.data.title is string
+        && request.resource.data.title.size() > 0
+        && request.resource.data.companyName is string
+        && request.resource.data.companyName.size() > 0
+        && request.resource.data.location is string
+        && request.resource.data.location.size() > 0
+        && request.resource.data.description is string
+        && request.resource.data.description.size() > 0
+        && request.resource.data.requirement is string
+        && request.resource.data.requirement.size() > 0
+        && request.resource.data.contactEmail is string
+        && request.resource.data.contactEmail.size() > 0
+        && request.resource.data.deadline is string
+        && request.resource.data.deadline.size() > 0
+        && request.resource.data.createdBy == request.auth.uid
+        && request.resource.data.createdAt is timestamp;
+    }
+
+    function isUser() {
+      return isSignedIn() && myRole() == 'user';
+    }
+
+    function validUserRole(role) {
+      return role in ['user', 'company'];
+    }
+
+    function allowedUserFields() {
+      return [
+        'email',
+        'role',
+        'createdAt',
+        'fullName',
+        'headline',
+        'location',
+        'skills',
+        'resumeUrl',
+        'companyName',
+        'website',
+        'description',
+        'savedInternships'
+      ];
+    }
+
+    function emailMatchesAuth(email) {
+      return request.auth.token.email != null && email == request.auth.token.email;
+    }
+
+    function isValidUserCreate(uid) {
+      return isSignedIn()
+        && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(allowedUserFields())
+        && request.resource.data.email is string
+        && emailMatchesAuth(request.resource.data.email)
+        && request.resource.data.role is string
+        && validUserRole(request.resource.data.role)
+        && request.resource.data.createdAt is timestamp
+        && (!('fullName' in request.resource.data) || request.resource.data.fullName is string)
+        && (!('headline' in request.resource.data) || request.resource.data.headline is string)
+        && (!('location' in request.resource.data) || request.resource.data.location is string)
+        && (!('skills' in request.resource.data) || request.resource.data.skills is list)
+        && (!('resumeUrl' in request.resource.data) || request.resource.data.resumeUrl is string)
+        && (!('companyName' in request.resource.data) || request.resource.data.companyName is string)
+        && (!('website' in request.resource.data) || request.resource.data.website is string)
+        && (!('description' in request.resource.data) || request.resource.data.description is string)
+        && (!('savedInternships' in request.resource.data) || request.resource.data.savedInternships is list);
+    }
+
+    function isValidUserUpdate(uid) {
+      return isSignedIn()
+        && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(allowedUserFields())
+        && request.resource.data.email == resource.data.email
+        && request.resource.data.role == resource.data.role
+        && request.resource.data.createdAt == resource.data.createdAt
+        && (!('fullName' in request.resource.data) || request.resource.data.fullName is string)
+        && (!('headline' in request.resource.data) || request.resource.data.headline is string)
+        && (!('location' in request.resource.data) || request.resource.data.location is string)
+        && (!('skills' in request.resource.data) || request.resource.data.skills is list)
+        && (!('resumeUrl' in request.resource.data) || request.resource.data.resumeUrl is string)
+        && (!('companyName' in request.resource.data) || request.resource.data.companyName is string)
+        && (!('website' in request.resource.data) || request.resource.data.website is string)
+        && (!('description' in request.resource.data) || request.resource.data.description is string)
+        && (!('savedInternships' in request.resource.data) || request.resource.data.savedInternships is list);
+    }
+
+    // ── /users ──────────────────────────────────────────────────────────────
+    match /users/{uid} {
+      // Users can read their own profile. Admins can read any profile.
+      allow read: if isOwner(uid) || isAdmin();
+
+      // Users can create only their own profile document, and only with the
+      // expected role values used by the app.
+      allow create: if isValidUserCreate(uid);
+
+      // Users can update only their own profile document, and cannot change
+      // ownership, email, role, or createdAt.
+      allow update: if isValidUserUpdate(uid) || isAdmin();
+
+      // Users can delete only their own profile document. Admins can delete any.
+      allow delete: if isOwner(uid) || isAdmin();
+    }
+
+    // ── /internships ────────────────────────────────────────────────────────
+    match /internships/{internshipId} {
+      // Any authenticated user may read internship listings.
+      allow read: if isSignedIn();
+
+      // Only companies may create internship listings.
+      allow create: if isCompanyAccount(request.auth.uid)
+        && isValidInternshipCreate();
+
+      // Only the company that created the listing (or an admin) may update/delete it.
+      allow update, delete: if isSignedIn()
+        && (resource.data.createdBy == request.auth.uid || isAdmin());
+    }
+
+    // ── /chats ──────────────────────────────────────────────────────────────
+    match /chats/{chatId} {
+      // A user may read a conversation only if they are a participant.
+      allow read: if isSignedIn()
+        && request.auth.uid in resource.data.participants;
+
+      // A user may create a conversation only if they include themselves as a participant.
+      allow create: if isSignedIn()
+        && request.resource.data.participants is list
+        && request.auth.uid in request.resource.data.participants;
+
+      // A participant may update conversation metadata (e.g., lastMessage, unreadCount).
+      // Also allow repair updates when an older malformed doc is missing participants in resource.
+      allow update: if isSignedIn()
+        && (
+          (resource.data.participants is list && request.auth.uid in resource.data.participants)
+          || (request.resource.data.participants is list && request.auth.uid in request.resource.data.participants)
+        );
+
+      // Only admins may delete conversations.
+      allow delete: if isAdmin();
+
+      // ── /chats/{chatId}/messages ──────────────────────────────────────────
+      match /messages/{messageId} {
+        // Participants may read messages.
+        allow read: if isSignedIn()
+          && request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.participants;
+
+        // A participant may send a message if they are the sender.
+        allow create: if isSignedIn()
+          && request.resource.data.senderId == request.auth.uid
+          && request.auth.uid in getAfter(/databases/$(database)/documents/chats/$(chatId)).data.participants;
+
+        // Messages may be updated (e.g., isRead flag) by any participant.
+        allow update: if isSignedIn()
+          && request.auth.uid in getAfter(/databases/$(database)/documents/chats/$(chatId)).data.participants;
+
+        // Only admins may delete messages.
+        allow delete: if isAdmin();
+      }
+    }
+
+    // ── /admin (admin-only collection for audit logs, settings, etc.) ───────
+    match /admin/{document=**} {
+      // Only admins may read/write admin documents.
+      allow read, write: if isAdmin();
+    }
+  }
+}

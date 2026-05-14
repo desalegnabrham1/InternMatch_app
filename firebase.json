@@ -1,0 +1,46 @@
+{
+  "firestore": {
+    "database": "(default)",
+    "location": "asia-east1",
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  },
+  "auth": {
+    "providers": {
+      "emailPassword": true,
+      "googleSignIn": {
+        "oAuthBrandDisplayName": "InternMatch",
+        "supportEmail": "admin2@gmail.com",
+        "authorizedRedirectUris": [
+          "https://internshipapp-eaf18.firebaseapp.com/__/auth/handler"
+        ]
+      }
+    }
+  },
+  "functions": {
+    "source": "functions"
+  },
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "internshipapp-eaf18",
+          "appId": "1:175322652316:android:208d575b9d6a5e2d9e1759",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "internshipapp-eaf18",
+          "configurations": {
+            "android": "1:175322652316:android:208d575b9d6a5e2d9e1759",
+            "ios": "1:175322652316:ios:406639e97e840b2f9e1759",
+            "macos": "1:175322652316:ios:406639e97e840b2f9e1759",
+            "web": "1:175322652316:web:4ac88d5445c26ed49e1759",
+            "windows": "1:175322652316:web:fe521ee4645148999e1759"
+          }
+        }
+      }
+    }
+  }
+}

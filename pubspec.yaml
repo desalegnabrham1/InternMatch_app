@@ -1,0 +1,43 @@
+name: internship_finder
+description: InternMatch - Internship Finder Mobile Application
+
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  firebase_core: ^4.7.0
+  firebase_auth: ^6.4.0
+  cloud_firestore: ^6.3.0
+  firebase_storage: ^13.3.0
+  cloud_functions: ^6.1.0
+
+  # URL Launcher
+  url_launcher: ^6.2.4
+
+  # File picker
+  file_picker: ^11.0.2
+
+  google_sign_in: ^6.1.0
+  font_awesome_flutter: ^11.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^3.0.0
+  flutter_launcher_icons: ^0.14.4
+
+flutter:
+  uses-material-design: true
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "web/icons/favicon.png"
